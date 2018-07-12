@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./carousel.css" />
+    <title>Carousel</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            position: relative;
+            height: 100%;
+            background: #ddd;
+        }
+
+        .carousel-container {
+            width: 100%;
+            height: 300px;
+            margin: 50px 0;
+        }
+
+        .carousel-item {
+            line-height: 300px;
+            text-align: center;
+            color: #000;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="carousel-container">
+        <div class="carousel-wrapper">
+            <div class="carousel-item">carousel1</div>
+            <div class="carousel-item">carousel2</div>
+            <div class="carousel-item">carousel3</div>
+        </div>
+        <!-- navigation -->
+        <div class="carousel-button-prev"></div>
+        <div class="carousel-button-next"></div>
+        <!-- pagination -->
+        <div class="carousel-pagination"></div>
+    </div>
+    <button class="carousel-next-button" style="background: #fff;width: 50px;height: 25px;">next</button>
+    <script src="./carousel.js"></script>
+</body>
+</html>
