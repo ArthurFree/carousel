@@ -15,6 +15,13 @@
     display: flex;
 }
 
+.carousel-container-vertical > .carousel-wrapper {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+}
+
 .carousel-item {
     position: relative;
     flex-shrink: 0;

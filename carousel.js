@@ -101,11 +101,13 @@ function Carousel(opts) {
     self.realTotal = self.slideTotal;
     
     self.activeIndex = self.params.initialSlide;
+    self.isHor = self.params.direction === 'horizontal';
+    self.isVer = self.params.direction === 'vertical';
     // self.prevIndex = self.activeIndex === 0 ? self.slideTotal - 1 : self.activeIndex - 1;
     // self.nextIndex = self.activeIndex === (self.slideTotal - 1) ? 0 : self.activeIndex + 1;
     self.currOffset = {
-        x: self.params.direction === 'horizontal' ? -(self.params.initialSlide * self.slideWidth) : 0,
-        y: self.params.direction === 'horizontal' ? 0 : -(self.params.initialSlide * self.slideHeight),
+        x: self.isHor ? -(self.params.initialSlide * self.slideWidth) : 0,
+        y: self.isHor ? 0 : -(self.params.initialSlide * self.slideHeight),
     };
     self.allowSlide = true;
 
@@ -174,16 +176,15 @@ Carousel.prototype.renderLoop = function () {
 
 Carousel.prototype.resetLoop = function () {
     const self = this;
-    const isHor = self.params.direction === 'horizontal';
     let offsetX, offsetY, newIndex = 1;
 
     if (self.activeIndex === (self.slideTotal - 1)) {
-        offsetX = isHor ? -1 * self.slideWidth : 0;
-        offsetY = isHor ? 0 : -1 * self.slideHeight;
+        offsetX = self.isHor ? -1 * self.slideWidth : 0;
+        offsetY = self.isHor ? 0 : -1 * self.slideHeight;
         newIndex = 1;
     } else if (self.activeIndex === 0) {
-        offsetX = isHor ? -(self.slideTotal - 2) * self.slideWidth : 0;
-        offsetY = isHor ? 0 : -(self.slideTotal - 2) * self.slideHeight;
+        offsetX = self.isHor ? -(self.slideTotal - 2) * self.slideWidth : 0;
+        offsetY = self.isHor ? 0 : -(self.slideTotal - 2) * self.slideHeight;
         newIndex = self.lideTotal - 2;
     } else {
         return;
@@ -195,31 +196,29 @@ Carousel.prototype.resetLoop = function () {
     };
     self.setTranslate(offsetX, offsetY);
     self.updateIndex(newIndex);
-    self.updateTranslate(isHor ? offsetX : offsetY);
+    self.updateTranslate(self.isHor ? offsetX : offsetY);
 }
 
 Carousel.prototype.initLoop = function () {
     const self = this;
     const initialSlide = self.correctIndex(self.params.initialSlide + 1);
-    const isHor = self.params.direction === 'horizontal';
-    const initOffsetX = isHor ? -initialSlide * self.slideWidth : 0;
-    const initOffsetY = isHor ? 0 : -initialSlide * self.slideHiehgt;
+    const initOffsetX = self.isHor ? -initialSlide * self.slideWidth : 0;
+    const initOffsetY = self.isHor ? 0 : -initialSlide * self.slideHeight;
 
     self.renderLoop();
     self.setTranslate(initOffsetX, initOffsetY);
     self.updateIndex(initialSlide);
-    self.updateTranslate(isHor ? initOffsetX : initOffsetY);
+    self.updateTranslate(self.isHor ? initOffsetX : initOffsetY);
 }
 
 Carousel.prototype.updateTranslate = function (translate) {
     const self = this;
-    const isHor = self.params.direction === 'horizontal';
     const currOffsetX = self.currOffset.x;
     const currOffsetY = self.currOffset.y;
 
     self.currOffset = {
-        x: isHor ? currOffsetX + translate : 0,
-        y: isHor ? 0 : currOffsetY + translate,
+        x: self.isHor ? currOffsetX + translate : 0,
+        y: self.isHor ? 0 : currOffsetY + translate,
     }
 }
 
@@ -247,7 +246,6 @@ Carousel.prototype.removeTransition = function () {
 Carousel.prototype.handleTransitionEnd = function () {
     const self = this;
     const speed = self.params.speed;
-    const isHor = self.params.direction === 'horizontal';
     const loopIndex = self.getIndex();
     let offsetX = 0, offsetY = 0;
         
@@ -261,21 +259,18 @@ Carousel.prototype.handleTransitionEnd = function () {
 
 Carousel.prototype.slideTo = function (index) {
     const self = this;
-    const isHor = self.params.direction === 'horizontal';
     const correctIndex = self.correctIndex(index);
-    const offsetX = isHor ? (self.activeIndex - correctIndex) * self.slideWidth : 0;
-    const offsetY = isHor ? 0 : (self.activeIndex - correctIndex) * self.slideHeight;
+    const offsetX = self.isHor ? (self.activeIndex - correctIndex) * self.slideWidth : 0;
+    const offsetY = self.isHor ? 0 : (self.activeIndex - correctIndex) * self.slideHeight;
     const costTime = self.params.speed + 10;
     let time, loopIndex;
-
-    // debugger
 
     if (!self.allowSlide) return;
 
     self.allowSlide = false;
     self.setTransition('transform', self.params.speed);
     self.setTranslate(offsetX, offsetY);
-    self.updateTranslate(isHor ? offsetX : offsetY);
+    self.updateTranslate(self.isHor ? offsetX : offsetY);
     self.updateIndex(index);
 
     if (self.params.pagination.enabled) {
@@ -436,16 +431,28 @@ Carousel.prototype.preRender = function () {
     });
 }
 
+Carousel.prototype.setDir = function () {
+    const self = this;
+
+    addClass(self.$el, 'carousel-container-vertical');
+}
+
 Carousel.prototype.init = function () {
     const self = this;
-    const isHor = self.params.direction === 'horizontal';
     const initialSlide = self.params.initialSlide;
     let initOffsetX = 0, initOffsetY = 0;
+
+    // debugger
 
     self.preRender();
     self.setTranslate(0, 0);
     // self.setTransition('transform', 0);
     self.removeTransition();
+    
+    if (self.isVer) {
+        self.setDir();
+    }
+
     if (self.params.loop) {
         self.initLoop();
         addEvent(self.$wrapperEl, 'transitionend', self.handleTransitionEnd.bind(self));
@@ -468,6 +475,7 @@ Carousel.prototype.init = function () {
 // 使用方法
 const options = {
     el: '.carousel-container',
+    direction: 'vertical',
     autoplay: {
         enabled: false,
         delay: 1000,
