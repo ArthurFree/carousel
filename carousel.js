@@ -1,53 +1,7 @@
 /**
  * Date: 2018年7月2日
- * Author: lvcheng
+ * Author: ArthurFree
  * Update: 2018年7月5日
- */
-
-
-/*
-
--   确定功能
-
-    -   支持翻页 - slideTo - 跳转到指定页面
-
-        -   设置当前页面 activeIndex(当前页索引) , prevIndex(上一页索引) , nextIndex(下一页索引)
-
-        -   使用 html class 标明 当前展示状态
-
-    -   无缝翻页 - loop
-
-        -   生成第一页和最后一页的复制元素并插入到文档中
-
-        -   使用 html class 标明 复制元素
-
-    -   点击滑动翻页
-
-    -   鼠标滚轮滑动
-
-    -   按键翻页
-
-
-*/
-
-/*
- * Date: 2018年7月9日
- * Update:
- * 1. 增加 pagination
- * 2. 增加 navigation
- * 3. 增加 竖向滚动支持
- */
-
-/*
- * TODO:
- *
- * 1. 当前布局采用flex，之后看看换一个新的布局方式
- * 2. 增加一个 extend 函数
- * 3. 丰富对 DOM 操作 的支持
- * 4. 项目工程化
- * 5. ts版本重构
- * 6. 增加单元测试
- * 7. 支持不同的框架
  */
 
 function $(selector) {
