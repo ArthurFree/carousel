@@ -8,29 +8,59 @@ function $(selector) {
     return document.querySelector(selector);
 }
 
+/**
+ * 设置属性
+ *
+ * @param {Element} selector 元素
+ * @param {Object} attrObj 需要设置的属性对象
+ */
 function setAttr(selector, attrObj) {
     for (let key in attrObj) {
         selector.setAttribute(key, attrObj[key]);
     }
 }
 
+/**
+ * 获取属性
+ *
+ * @param {Element} selector 元素
+ * @param {String} attrStr 属性名称
+ * @returns {Object|String} attrObj 获取到的属性的对象
+ */
 function getAttr(selector, attrStr) {
     const attrStrList = attrStr.split(' ');
-    const attrObj = {};
+    let attr = {};
 
-    attrStrList.forEach(function (item, index) {
+    attrStrList.forEach(function (item, index, arr) {
+        if (arr.length === 0) {
+            attr = selector.getAttribute(item);
+            return;
+        }
         attr[item] = selector.getAttribute(item);
     });
 
-    return attrObj;
+    return attr;
 }
 
+// TODO: 将 getAttribute 方法改换成使用 classNameList
+/**
+ * 给元素添加 class
+ *
+ * @param {Element} elem 元素
+ * @param {String} className class 字符串
+ */
 function addClass(elem, className) {
     const currClassName = elem.getAttribute('class');
     const newClassName = currClassName ? currClassName + ' ' + className.trim() : className.trim();
     elem.setAttribute('class', newClassName);
 }
 
+/**
+ * 移除元素上的 class
+ *
+ * @param {Element} elem 元素
+ * @param {String} className class 字符串
+ */
 function removeClass(elem, className) {
     if (arguments.length === 1) {
         elem.setAttribute('class', '');
@@ -50,10 +80,24 @@ function removeClass(elem, className) {
     }
 }
 
+/**
+ * 绑定事件
+ *
+ * @param {Element} selector 元素
+ * @param {String} eventName 事件名称
+ * @param {Function} callback 事件执行函数
+ */
 function addEvent(selector, eventName, callback) {
     selector.addEventListener(eventName, callback, false);
 }
 
+/**
+ * 移除绑定事件
+ *
+ * @param {Element} selector 元素
+ * @param {String} eventName 事件名称
+ * @param {Function} callback 事件执行函数
+ */
 function removeEvent(selector, eventName, callback) {
     selector.removeEventListener(eventName, callback, false);
 }
@@ -114,7 +158,12 @@ function Carousel(opts) {
     self.init();
 }
 
-Carousel.prototype.getIndex = function (isRealIndex) {
+/**
+ * 获取当前展示页的真实索引
+ *
+ * @returns {Number} index 当前页索引
+ */
+Carousel.prototype.getIndex = function () {
     const self = this;
     const index = self.activeIndex;
 
@@ -129,6 +178,12 @@ Carousel.prototype.getIndex = function (isRealIndex) {
     return index;
 }
 
+/**
+ * 矫正索引值
+ *
+ * @param {Number} index 待矫正的索引值
+ * @returns {Number} newIndex 矫正后的索引值
+ */
 Carousel.prototype.correctIndex = function (index) {
     const self = this;
     let newIndex;
@@ -144,6 +199,11 @@ Carousel.prototype.correctIndex = function (index) {
     return newIndex;
 }
 
+/**
+ * 更新当前页索引（activeIndex）
+ *
+ * @param {Number} index 新的索引值
+ */
 Carousel.prototype.updateIndex = function (index) {
     const self = this;
     const currIndex = self.activeIndex;
@@ -159,6 +219,9 @@ Carousel.prototype.updateIndex = function (index) {
     // self.nextIndex = index + 1;
 }
 
+/**
+ * 生成无缝循环所需的复制元素
+ */
 Carousel.prototype.renderLoop = function () {
     const self = this;
     const firstCloneEl = self.$slideEl[self.realTotal - 1].cloneNode(true);
@@ -174,6 +237,9 @@ Carousel.prototype.renderLoop = function () {
     setAttr(lastCloneEl, { 'data-index': self.slideTotal - 1 });
 }
 
+/**
+ * 当当前页处于复制元素上时执行重置位置操作
+ */
 Carousel.prototype.resetLoop = function () {
     const self = this;
     let offsetX, offsetY, newIndex = 1;
@@ -199,6 +265,9 @@ Carousel.prototype.resetLoop = function () {
     self.updateTranslate(self.isHor ? offsetX : offsetY);
 }
 
+/**
+ * 初始化无缝循环功能
+ */
 Carousel.prototype.initLoop = function () {
     const self = this;
     const initialSlide = self.correctIndex(self.params.initialSlide + 1);
@@ -211,6 +280,11 @@ Carousel.prototype.initLoop = function () {
     self.updateTranslate(self.isHor ? initOffsetX : initOffsetY);
 }
 
+/**
+ * 更新并存储当前最新的偏移量
+ *
+ * @param {Number} translate 与当前位置相对的偏移量
+ */
 Carousel.prototype.updateTranslate = function (translate) {
     const self = this;
     const currOffsetX = self.currOffset.x;
@@ -222,6 +296,12 @@ Carousel.prototype.updateTranslate = function (translate) {
     }
 }
 
+/**
+ * 设置元素偏移量并执行元素偏移
+ *
+ * @param {*} offsetX
+ * @param {*} offsetY
+ */
 Carousel.prototype.setTranslate = function (offsetX, offsetY) {
     const self = this;
     const newOffsetX = self.currOffset.x + offsetX;
@@ -230,6 +310,12 @@ Carousel.prototype.setTranslate = function (offsetX, offsetY) {
     self.$wrapperEl.style.transform = `translate3d(${newOffsetX}px, ${newOffsetY}px, 0)`;
 }
 
+/**
+ * 设置过渡效果
+ *
+ * @param {String}} property 属性名称
+ * @param {Number} duration 过渡时间
+ */
 Carousel.prototype.setTransition = function (property, duration) {
     const self = this;
     const time = duration <= 1 ? duration + 's' : duration + 'ms';
@@ -237,12 +323,18 @@ Carousel.prototype.setTransition = function (property, duration) {
     self.$wrapperEl.style.transition = `${property} ${time} ease`;
 }
 
+/**
+ * 移除过渡效果
+ */
 Carousel.prototype.removeTransition = function () {
     const self = this;
 
     self.$wrapperEl.style.transition = '';
 }
 
+/**
+ * transitionEnd 事件执行函数
+ */
 Carousel.prototype.handleTransitionEnd = function () {
     const self = this;
     const speed = self.params.speed;
@@ -257,6 +349,11 @@ Carousel.prototype.handleTransitionEnd = function () {
     }
 }
 
+/**
+ * 跳转到固定页数
+ *
+ * @param {Number} index 跳转的页面的索引
+ */
 Carousel.prototype.slideTo = function (index) {
     const self = this;
     const correctIndex = self.correctIndex(index);
@@ -278,6 +375,9 @@ Carousel.prototype.slideTo = function (index) {
     }
 }
 
+/**
+ * 左翻一页
+ */
 Carousel.prototype.slidePrev = function () {
     const self = this;
     let prevIndex = self.activeIndex - 1;
@@ -291,6 +391,11 @@ Carousel.prototype.slidePrev = function () {
     }
 }
 
+/**
+ * 右翻一页
+ *
+ * @returns
+ */
 Carousel.prototype.slideNext = function () {
     const self = this;
     let nextIndex = self.activeIndex + 1;
@@ -305,6 +410,9 @@ Carousel.prototype.slideNext = function () {
     self.slideTo(nextIndex);
 }
 
+/**
+ * 自动播放函数
+ */
 Carousel.prototype.autoplay = function () {
     const self = this;
     const speed = self.params.speed;
@@ -326,6 +434,9 @@ Carousel.prototype.autoplay = function () {
     
 }
 
+/**
+ * 开始自动播放
+ */
 Carousel.prototype.startAutoplay = function () {
     const self = this;
     const speed = self.params.speed;
@@ -334,12 +445,18 @@ Carousel.prototype.startAutoplay = function () {
     self.autoplay(delay);
 }
 
+/**
+ * 停止自动播放
+ */
 Carousel.prototype.stopAutoplay = function () {
     const self = this;
 
     clearInterval(self.autoplayTime);
 }
 
+/**
+ * 生成翻页按钮
+ */
 Carousel.prototype.renderNavigation = function () {
     const self = this;
     const prevClass = self.params.navigation.prevEl;
@@ -355,6 +472,12 @@ Carousel.prototype.renderNavigation = function () {
     addEvent(self.navNextEl, 'click', self.slideNext.bind(self));
 }
 
+/**
+ * 页码点击事件执行函数
+ *
+ * @param {Event} event 事件对象
+ * @returns
+ */
 Carousel.prototype.handleChangePagination = function (event) {
     const self = this;
     const $currPgItemEl = event.target;
@@ -373,6 +496,9 @@ Carousel.prototype.handleChangePagination = function (event) {
     self.slideTo(currPgIndex);
 }
 
+/**
+ * 生成页码
+ */
 Carousel.prototype.renderPagination = function () {
     const self = this;
     const $paginationEl = $(self.params.pagination.el);
@@ -402,6 +528,9 @@ Carousel.prototype.renderPagination = function () {
     self.$paginationItemElTotal = self.$paginationItemEl.length;
 }
 
+/**
+ * 跳转页面时更新页码
+ */
 Carousel.prototype.changePagination = function () {
     const self = this;
     const realIndex = self.getIndex(true);
@@ -422,6 +551,10 @@ Carousel.prototype.changePagination = function () {
     self.$activePaginationItemEl = $activePaginationItemEl;
 }
 
+/**
+ * 对每一页绑定 data-index 属性
+ *
+ */
 Carousel.prototype.preRender = function () {
     const self = this;
     const slideList = Array.prototype.slice.call(self.$slideEl);
@@ -431,12 +564,24 @@ Carousel.prototype.preRender = function () {
     });
 }
 
+/**
+ * 设置滚动方向
+ *
+ * @returns
+ */
 Carousel.prototype.setDir = function () {
     const self = this;
+
+    if (self.isHor) {
+        return removeClass(self.$el, 'carousel-container-vertical');
+    }
 
     addClass(self.$el, 'carousel-container-vertical');
 }
 
+/**
+ * 初始化函数
+ */
 Carousel.prototype.init = function () {
     const self = this;
     const initialSlide = self.params.initialSlide;
@@ -494,6 +639,7 @@ const options = {
     loop: true,
     speed: 1000,
 };
+
 const carouselInstance = new Carousel(options);
 $('.carousel-next-button').addEventListener('click', function () {
     carouselInstance.slideNext();
