@@ -569,7 +569,7 @@ Carousel.prototype.preRender = function () {
  *
  * @returns
  */
-Carousel.prototype.setDir = function () {
+Carousel.prototype.setDirClass = function () {
     const self = this;
 
     if (self.isHor) {
@@ -577,6 +577,30 @@ Carousel.prototype.setDir = function () {
     }
 
     addClass(self.$el, 'carousel-container-vertical');
+}
+
+Carousel.prototype.handleTouchStart = function () {
+    const self = this;
+}
+
+Carousel.prototype.handleTouchMove = function () {
+    const self = this;
+}
+
+Carousel.prototype.handleTouchEnd = function () {
+    const self = this;
+}
+
+Carousel.prototype.initTouch = function () {
+    const self = this;
+}
+
+Carousel.prototype.handleMouseDown = function () {
+    const self = this;
+}
+
+Carousel.prototype.handleMouseUp = function () {
+    const self = this;
 }
 
 /**
@@ -595,7 +619,7 @@ Carousel.prototype.init = function () {
     self.removeTransition();
     
     if (self.isVer) {
-        self.setDir();
+        self.setDirClass();
     }
 
     if (self.params.loop) {
