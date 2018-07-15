@@ -579,16 +579,28 @@ Carousel.prototype.setDirClass = function () {
     addClass(self.$el, 'carousel-container-vertical');
 }
 
-Carousel.prototype.handleTouchStart = function () {
+Carousel.prototype.handleTouchStart = function (event) {
     const self = this;
+
+    self.touchs.currentX = event.type === 'touchstart' ? event.touches.pageX : event.pageX;
+    self.touchs.currentY = event.type === 'touchstart' ? event.touches.pageX : event.pageY;
+
+    self.touchs.startX = self.touchs.currentX;
+    self.touchs.startY = self.touchs.currentY;
+    
+    console.log('---- touch start ----', event.touches, event.targetTouchs);
 }
 
 Carousel.prototype.handleTouchMove = function () {
     const self = this;
+
+    console.log('---- touch move ----', event.touches, event.targetTouchs);
 }
 
 Carousel.prototype.handleTouchEnd = function () {
     const self = this;
+
+    console.log('---- touch end ----', event.touches, event.targetTouchs);
 }
 
 Carousel.prototype.initTouch = function () {
@@ -639,6 +651,10 @@ Carousel.prototype.init = function () {
     if (self.params.navigation.enabled) {
         self.renderNavigation();
     }
+
+    addEvent(self.$wrapperEl, 'touchstart', self.handleTouchStart.bind(this));
+    addEvent(self.$wrapperEl, 'touchmove', self.handleTouchMove.bind(this));
+    addEvent(self.$wrapperEl, 'touchend', self.handleTouchEnd.bind(this));
 }
 
 // 使用方法
