@@ -153,6 +153,14 @@ function Carousel(opts) {
         x: self.isHor ? -(self.params.initialSlide * self.slideWidth) : 0,
         y: self.isHor ? 0 : -(self.params.initialSlide * self.slideHeight),
     };
+    self.touches = {
+        currentX: 0,
+        currentY: 0,
+        startX: 0,
+        startY: 0,
+        endX: 0,
+        endY: 0,
+    };
     self.allowSlide = true;
 
     self.init();
@@ -582,23 +590,34 @@ Carousel.prototype.setDirClass = function () {
 Carousel.prototype.handleTouchStart = function (event) {
     const self = this;
 
-    self.touchs.currentX = event.type === 'touchstart' ? event.touches.pageX : event.pageX;
-    self.touchs.currentY = event.type === 'touchstart' ? event.touches.pageX : event.pageY;
+    self.touches.currentX = event.type === 'touchstart' ? event.touches[0].pageX : event.pageX;
+    self.touches.currentY = event.type === 'touchstart' ? event.touches[0].pageY : event.pageY;
 
-    self.touchs.startX = self.touchs.currentX;
-    self.touchs.startY = self.touchs.currentY;
+    self.touches.startX = self.touches.currentX;
+    self.touches.startY = self.touches.currentY;
+
+    self.touchStartTime = Date.now();
     
     console.log('---- touch start ----', event.touches, event.targetTouchs);
 }
 
 Carousel.prototype.handleTouchMove = function () {
     const self = this;
+    const touches = self.touches;
+    const pageX = event.type === 'touchmove' ? event.touches[0].pageX : event.pageX;
+    const pageY = event.type === 'touchmove' ? event.touches[0].pageY : event.pageY;
+    const diffX = self.isHor ? pageX - self.touches.currentX : 0;
+    const diffY = self.isHor ? 0 : pageX - self.touches.currentY;
 
-    console.log('---- touch move ----', event.touches, event.targetTouchs);
+    self.setTranslate(diffX, diffY);
+
+    console.log('---- touch move ----', diffX, diffY);
 }
 
 Carousel.prototype.handleTouchEnd = function () {
     const self = this;
+
+    self.touchEndTime = Date.now();
 
     console.log('---- touch end ----', event.touches, event.targetTouchs);
 }
@@ -660,7 +679,7 @@ Carousel.prototype.init = function () {
 // 使用方法
 const options = {
     el: '.carousel-container',
-    direction: 'vertical',
+    // direction: 'vertical',
     autoplay: {
         enabled: false,
         delay: 1000,
