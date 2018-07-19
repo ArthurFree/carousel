@@ -601,7 +601,7 @@ Carousel.prototype.handleTouchStart = function (event) {
     console.log('---- touch start ----', event.touches, event.targetTouchs);
 }
 
-Carousel.prototype.handleTouchMove = function () {
+Carousel.prototype.handleTouchMove = function (event) {
     const self = this;
     const touches = self.touches;
     const pageX = event.type === 'touchmove' ? event.touches[0].pageX : event.pageX;
@@ -614,10 +614,46 @@ Carousel.prototype.handleTouchMove = function () {
     console.log('---- touch move ----', diffX, diffY);
 }
 
-Carousel.prototype.handleTouchEnd = function () {
+Carousel.prototype.handleTouchEnd = function (event) {
     const self = this;
 
     self.touchEndTime = Date.now();
+    self.touches.endX = event.type === 'touchend' ? event.touches[0].pageX : event.pageX;
+    self.touches.endY = event.type === 'touchend' ? event.touches[0].pageY : event.pageY;
+
+    const diffOffset = self.isHor ? (self.touches.endX - self.touches.startX) : (self.touches.endY - self.touches.startY);
+
+    if ((self.touchEndTime - self.touchStartTime) > 300) {
+        if (isHor) {
+            if (self.touches.endX > self.touches.startX) {
+                self.slideNext();
+            } else if (self.touches.endX < self.touches.startX) {
+                self.slidePrev();
+            } else {
+                return;
+            }
+        } else {
+            if (self.touches.endY > self.touches.endY) {
+                self.slideNext();
+            } else if (self.touches.endY < self.touches.startY) {
+                self.slidePrev();
+            } else {
+                return;
+            }
+        }
+    } else if (isHor) {
+        if (Math.abs(diffOffset) > 0.5 * self.slideWidth) {
+            self.slideNext();
+        } else {
+            self.setTranslate(0, 0);
+        }
+    } else {
+        if (Math.abs(diffOffset) > 0.5 * self.slideHeight) {
+            self.slideNext();
+        } else {
+            self.setTranslate(0, 0);
+        }
+    }
 
     console.log('---- touch end ----', event.touches, event.targetTouchs);
 }
