@@ -173,7 +173,7 @@ function Carousel(opts) {
  */
 Carousel.prototype.getIndex = function () {
     const self = this;
-    const index = self.activeIndex;
+    let index = self.activeIndex;
 
     if (self.params.loop) {
         if (index === 0) {
@@ -390,13 +390,13 @@ Carousel.prototype.slidePrev = function () {
     const self = this;
     let prevIndex = self.activeIndex - 1;
 
-    if (self.params.loop) {} else {
-        if (prevIndex < 0) {
-            prevIndex = 0;
-            return console.log('已经是第一页了！！！');
-        }
-        self.slideTo(prevIndex);
+    if (self.params.loop) {
+        prevIndex = self.correctIndex(prevIndex);
+    } else if (prevIndex < 0) {
+        prevIndex = 0;
+        return console.log('已经是第一页了！！！');
     }
+    self.slideTo(prevIndex);
 }
 
 /**
@@ -618,37 +618,40 @@ Carousel.prototype.handleTouchEnd = function (event) {
     const self = this;
 
     self.touchEndTime = Date.now();
-    self.touches.endX = event.type === 'touchend' ? event.touches[0].pageX : event.pageX;
-    self.touches.endY = event.type === 'touchend' ? event.touches[0].pageY : event.pageY;
+    self.touches.endX = event.type === 'touchend' ? event.changedTouches[0].pageX : event.pageX;
+    self.touches.endY = event.type === 'touchend' ? event.changedTouches[0].pageY : event.pageY;
 
     const diffOffset = self.isHor ? (self.touches.endX - self.touches.startX) : (self.touches.endY - self.touches.startY);
 
-    if ((self.touchEndTime - self.touchStartTime) > 300) {
-        if (isHor) {
+    console.log('---- pos ----', self.touches.startX, self.touches.endX);
+    debugger
+
+    if ((self.touchEndTime - self.touchStartTime) < 500) {
+        if (self.isHor) {
             if (self.touches.endX > self.touches.startX) {
-                self.slideNext();
-            } else if (self.touches.endX < self.touches.startX) {
                 self.slidePrev();
+            } else if (self.touches.endX < self.touches.startX) {
+                self.slideNext();
             } else {
-                return;
+                return self.setTranslate(0, 0);
             }
         } else {
-            if (self.touches.endY > self.touches.endY) {
-                self.slideNext();
-            } else if (self.touches.endY < self.touches.startY) {
+            if (self.touches.endY > self.touches.startY) {
                 self.slidePrev();
+            } else if (self.touches.endY < self.touches.startY) {
+                self.slideNext();
             } else {
-                return;
+                return self.setTranslate(0, 0);
             }
         }
-    } else if (isHor) {
-        if (Math.abs(diffOffset) > 0.5 * self.slideWidth) {
+    } else if (self.isHor) {
+        if (Math.abs(diffOffset) >= 0.33 * self.slideWidth) {
             self.slideNext();
         } else {
             self.setTranslate(0, 0);
         }
     } else {
-        if (Math.abs(diffOffset) > 0.5 * self.slideHeight) {
+        if (Math.abs(diffOffset) >= 0.33 * self.slideHeight) {
             self.slideNext();
         } else {
             self.setTranslate(0, 0);
