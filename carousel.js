@@ -222,6 +222,7 @@ Carousel.prototype.updateIndex = function (index) {
     newIndex = self.correctIndex(index);
 
     self.activeIndex = newIndex;
+    console.log('---- updateIndex self.activeIndex ---', self.activeIndex);
 
     // self.prevIndex = index - 1;
     // self.nextIndex = index + 1;
@@ -259,11 +260,12 @@ Carousel.prototype.resetLoop = function () {
     } else if (self.activeIndex === 0) {
         offsetX = self.isHor ? -(self.slideTotal - 2) * self.slideWidth : 0;
         offsetY = self.isHor ? 0 : -(self.slideTotal - 2) * self.slideHeight;
-        newIndex = self.lideTotal - 2;
+        newIndex = self.slideTotal - 2;
     } else {
         return;
     }
-
+    console.log('--- resetLoop self.activeIndex ---', self.activeIndex);
+    // debugger
     self.currOffset = {
         x: 0,
         y: 0,
@@ -350,7 +352,7 @@ Carousel.prototype.handleTransitionEnd = function () {
     let offsetX = 0, offsetY = 0;
         
     self.allowSlide = true;
-
+    console.log('---- hadhleTransitionEnd ---');
     if (self.params.loop) {
         self.removeTransition();
         self.resetLoop();
@@ -371,6 +373,7 @@ Carousel.prototype.slideTo = function (index) {
     let time, loopIndex;
 
     if (!self.allowSlide) return;
+    console.log('---- slideTo self.activeIndex ---', self.activeIndex);
 
     self.allowSlide = false;
     self.setTransition('transform', self.params.speed);
@@ -616,17 +619,20 @@ Carousel.prototype.handleTouchMove = function (event) {
 
 Carousel.prototype.handleTouchEnd = function (event) {
     const self = this;
+    const touchEndTime = Date.now();
+    const timeDiff = touchEndTime - self.touchStartTime;
 
-    self.touchEndTime = Date.now();
+    self.touchEndTime = touchEndTime;
     self.touches.endX = event.type === 'touchend' ? event.changedTouches[0].pageX : event.pageX;
     self.touches.endY = event.type === 'touchend' ? event.changedTouches[0].pageY : event.pageY;
 
     const diffOffset = self.isHor ? (self.touches.endX - self.touches.startX) : (self.touches.endY - self.touches.startY);
 
     console.log('---- pos ----', self.touches.startX, self.touches.endX);
-    debugger
+    console.log('---- self.activeIndex ---', self.activeIndex);
+    // debugger
 
-    if ((self.touchEndTime - self.touchStartTime) < 500) {
+    if (timeDiff < 500) {
         if (self.isHor) {
             if (self.touches.endX > self.touches.startX) {
                 self.slidePrev();
