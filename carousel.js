@@ -364,19 +364,19 @@ Carousel.prototype.handleTransitionEnd = function () {
  *
  * @param {Number} index 跳转的页面的索引
  */
-Carousel.prototype.slideTo = function (index) {
+Carousel.prototype.slideTo = function (index, speed) {
     const self = this;
     const correctIndex = self.correctIndex(index);
     const offsetX = self.isHor ? (self.activeIndex - correctIndex) * self.slideWidth : 0;
     const offsetY = self.isHor ? 0 : (self.activeIndex - correctIndex) * self.slideHeight;
-    const costTime = self.params.speed + 10;
-    let time, loopIndex;
+    const transitionSpeed = speed ? speed : self.params.speed;
+    let time, loopIndex, transitionSpeed = ;
 
     if (!self.allowSlide) return;
     console.log('---- slideTo self.activeIndex ---', self.activeIndex);
 
     self.allowSlide = false;
-    self.setTransition('transform', self.params.speed);
+    self.setTransition('transform', transitionSpeed);
     self.setTranslate(offsetX, offsetY);
     self.updateTranslate(self.isHor ? offsetX : offsetY);
     self.updateIndex(index);
@@ -654,6 +654,7 @@ Carousel.prototype.handleTouchEnd = function (event) {
         if (Math.abs(diffOffset) >= 0.33 * self.slideWidth) {
             self.slideNext();
         } else {
+            self.setTransition('transform', self.params.speed);
             self.setTranslate(0, 0);
         }
     } else {
