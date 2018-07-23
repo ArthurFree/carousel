@@ -164,6 +164,9 @@ function Carousel(opts) {
         endX: 0,
         endY: 0,
     };
+    self.autoplayStatus = {
+        running: false,
+    };
     self.allowSlide = true;
     self.isClick = false;
 
@@ -360,6 +363,11 @@ Carousel.prototype.handleTransitionEnd = function () {
         self.removeTransition();
         self.resetLoop();
     }
+
+    if (self.params.autoplay.enabled && !self.autoplayStatus.running) {
+        self.autoplayStatus.running = true;
+        self.startAutoplay();
+    }
 }
 
 /**
@@ -433,6 +441,7 @@ Carousel.prototype.autoplay = function () {
     const delay = self.params.autoplay.delay + speed;
     let auotplayFunc;
 
+    self.autoplayStatus.running = true;
     self.autoplayTime = setInterval(function () {
         if (self.params.loop) {
             autoplayFunc = self.slideNext;
@@ -455,6 +464,8 @@ Carousel.prototype.startAutoplay = function () {
     const self = this;
     const speed = self.params.speed;
     const delay = self.params.autoplay.delay + speed;
+
+    self.autoplayStatus = false;
 
     self.autoplay(delay);
 }
@@ -611,6 +622,12 @@ Carousel.prototype.handleTouchStart = function (event) {
 
     self.touchStartTime = Date.now();
     // if (activeIndex === 4) debugger
+
+    if (self.params.autoplay.enabled && self.autoplayStatus.running) {
+        // self.autoplay.running = false;
+        self.stopAutoplay();
+    }
+
     if (activeIndex === 0) {
         // self.setTranslate();
         newIndex = self.slideTotal - 2;
@@ -703,28 +720,6 @@ Carousel.prototype.handleTouchEnd = function (event) {
     // console.log('---- touch end ----', event.touches, event.targetTouchs);
 }
 
-Carousel.prototype.initTouch = function () {
-    const self = this;
-}
-
-Carousel.prototype.handleMouseDown = function (event) {
-    const self = this;
-
-    console.log('--- mouse down ---', event);
-}
-
-Carousel.prototype.handleMouseMove = function (event) {
-    const self = this;
-
-    console.log('--- mouse move ---', event);
-}
-
-Carousel.prototype.handleMouseUp = function (event) {
-    const self = this;
-
-    console.log('--- mouse up ---', event);
-}
-
 Carousel.prototype.initEvent = function () {
     const self = this;
 
@@ -743,9 +738,6 @@ Carousel.prototype.initEvent = function () {
         addEvent(self.$wrapperEl, 'mousedown', self.handleTouchStart.bind(this));
         addEvent(document, 'mousemove', self.handleTouchMove.bind(this));
         addEvent(document, 'mouseup', self.handleTouchEnd.bind(this));
-        // addEvent(self.$wrapperEl, 'mousedown', self.handleMouseDown.bind(this));
-        // addEvent(self.$wrapperEl, 'mousemove', self.handleMouseMove.bind(this))
-        // addEvent(self.$wrapperEl, 'mouseup', self.handleMouseUp.bind(this));
     }
 }
 
@@ -790,7 +782,7 @@ const options = {
     el: '.carousel-container',
     // direction: 'vertical',
     autoplay: {
-        enabled: false,
+        enabled: true,
         delay: 1000,
     },
     navigation: {
