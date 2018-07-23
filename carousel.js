@@ -112,6 +112,7 @@ function Carousel(opts) {
         speed: 500,
         loop: false,
         allowTouchMove: true,
+        allowClickMove: true,
         autoplay: {
             enabled: false,
             delay: 500,
@@ -154,6 +155,7 @@ function Carousel(opts) {
         x: self.isHor ? -(self.params.initialSlide * self.slideWidth) : 0,
         y: self.isHor ? 0 : -(self.params.initialSlide * self.slideHeight),
     };
+    self.isTouchEvent = false;
     self.touches = {
         currentX: 0,
         currentY: 0,
@@ -163,6 +165,7 @@ function Carousel(opts) {
         endY: 0,
     };
     self.allowSlide = true;
+    self.isClick = false;
 
     self.init();
 }
@@ -596,8 +599,12 @@ Carousel.prototype.handleTouchStart = function (event) {
     let offsetX = 0, offsetY = 0;
     let newIndex = 0;
 
-    self.touches.currentX = event.type === 'touchstart' ? event.touches[0].pageX : event.pageX;
-    self.touches.currentY = event.type === 'touchstart' ? event.touches[0].pageY : event.pageY;
+    self.isTouchEvent = event.type === 'touchstart';
+
+    if (!self.isTouchEvent && event.type === 'mousedown') self.isClick = true;
+
+    self.touches.currentX = self.isTouchEvent ? event.touches[0].pageX : event.pageX;
+    self.touches.currentY = self.isTouchEvent ? event.touches[0].pageY : event.pageY;
 
     self.touches.startX = self.touches.currentX;
     self.touches.startY = self.touches.currentY;
@@ -636,15 +643,19 @@ Carousel.prototype.handleTouchMove = function (event) {
     const diffX = self.isHor ? pageX - self.touches.currentX : 0;
     const diffY = self.isHor ? 0 : pageX - self.touches.currentY;
 
+    if (self.isTouchEvent && event.type === 'mousemove') return;
+    if (!self.isClick) return;
+
     self.setTranslate(diffX, diffY);
 
-    // console.log('---- touch move ----', diffX, diffY);
 }
 
 Carousel.prototype.handleTouchEnd = function (event) {
     const self = this;
     const touchEndTime = Date.now();
     const timeDiff = touchEndTime - self.touchStartTime;
+
+    if (!self.isTouchEvent && event.type === 'mouseup') self.isClick = false;
 
     self.touchEndTime = touchEndTime;
     self.touches.endX = event.type === 'touchend' ? event.changedTouches[0].pageX : event.pageX;
@@ -696,12 +707,22 @@ Carousel.prototype.initTouch = function () {
     const self = this;
 }
 
-Carousel.prototype.handleMouseDown = function () {
+Carousel.prototype.handleMouseDown = function (event) {
     const self = this;
+
+    console.log('--- mouse down ---', event);
 }
 
-Carousel.prototype.handleMouseUp = function () {
+Carousel.prototype.handleMouseMove = function (event) {
     const self = this;
+
+    console.log('--- mouse move ---', event);
+}
+
+Carousel.prototype.handleMouseUp = function (event) {
+    const self = this;
+
+    console.log('--- mouse up ---', event);
 }
 
 Carousel.prototype.initEvent = function () {
@@ -716,6 +737,15 @@ Carousel.prototype.initEvent = function () {
         addEvent(self.$wrapperEl, 'touchstart', self.handleTouchStart.bind(this));
         addEvent(self.$wrapperEl, 'touchmove', self.handleTouchMove.bind(this));
         addEvent(self.$wrapperEl, 'touchend', self.handleTouchEnd.bind(this));
+    }
+
+    if (self.params.allowClickMove) {
+        addEvent(self.$wrapperEl, 'mousedown', self.handleTouchStart.bind(this));
+        addEvent(document, 'mousemove', self.handleTouchMove.bind(this));
+        addEvent(document, 'mouseup', self.handleTouchEnd.bind(this));
+        // addEvent(self.$wrapperEl, 'mousedown', self.handleMouseDown.bind(this));
+        // addEvent(self.$wrapperEl, 'mousemove', self.handleMouseMove.bind(this))
+        // addEvent(self.$wrapperEl, 'mouseup', self.handleMouseUp.bind(this));
     }
 }
 
