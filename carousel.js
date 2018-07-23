@@ -222,7 +222,7 @@ Carousel.prototype.updateIndex = function (index) {
     newIndex = self.correctIndex(index);
 
     self.activeIndex = newIndex;
-    console.log('---- updateIndex self.activeIndex ---', self.activeIndex);
+    // console.log('---- updateIndex self.activeIndex ---', self.activeIndex);
 
     // self.prevIndex = index - 1;
     // self.nextIndex = index + 1;
@@ -264,7 +264,7 @@ Carousel.prototype.resetLoop = function () {
     } else {
         return;
     }
-    console.log('--- resetLoop self.activeIndex ---', self.activeIndex);
+    // console.log('--- resetLoop self.activeIndex ---', self.activeIndex);
     // debugger
     self.currOffset = {
         x: 0,
@@ -370,10 +370,10 @@ Carousel.prototype.slideTo = function (index, speed) {
     const offsetX = self.isHor ? (self.activeIndex - correctIndex) * self.slideWidth : 0;
     const offsetY = self.isHor ? 0 : (self.activeIndex - correctIndex) * self.slideHeight;
     const transitionSpeed = speed ? speed : self.params.speed;
-    let time, loopIndex, transitionSpeed = speed ? speed : self.params.speed;
+    let time, loopIndex;
 
     if (!self.allowSlide) return;
-    console.log('---- slideTo self.activeIndex ---', self.activeIndex);
+    // console.log('---- slideTo self.activeIndex ---', self.activeIndex);
 
     self.allowSlide = false;
     self.setTransition('transform', transitionSpeed);
@@ -592,6 +592,8 @@ Carousel.prototype.setDirClass = function () {
 
 Carousel.prototype.handleTouchStart = function (event) {
     const self = this;
+    const activeIndex = self.activeIndex;
+    let offsetX = 0, offsetY = 0;
 
     self.touches.currentX = event.type === 'touchstart' ? event.touches[0].pageX : event.pageX;
     self.touches.currentY = event.type === 'touchstart' ? event.touches[0].pageY : event.pageY;
@@ -600,8 +602,26 @@ Carousel.prototype.handleTouchStart = function (event) {
     self.touches.startY = self.touches.currentY;
 
     self.touchStartTime = Date.now();
+    // if (activeIndex === 4) debugger
+    if (activeIndex === 0) {
+        // self.setTranslate();
+        offsetX = self.isHor ? -(self.slideTotal - 2) * self.slideWidth : 0;
+        offsetY = self.isHor ? 0 : -(self.slideTotal - 2) * self.slideHeight;
+    } else if (activeIndex === self.slideTotal - 1) {
+        offsetX = self.isHor ? -self.slideWidth : 0;
+        offsetY = self.isHor ? 0 : -self.slideHeight;
+    }
+
+    if (offsetX || offsetY) {
+        // self.updateTranslate(0);
+        self.currOffset.x = 0;
+        self.currOffset.y = 0;
+        self.removeTransition();
+        self.setTranslate(offsetX, offsetY);
+        self.updateTranslate(self.isHor ? offsetX : offsetY);
+    }
     
-    console.log('---- touch start ----', event.touches, event.targetTouchs);
+    // console.log('---- touch start ----', event.touches, event.targetTouchs);
 }
 
 Carousel.prototype.handleTouchMove = function (event) {
@@ -614,7 +634,7 @@ Carousel.prototype.handleTouchMove = function (event) {
 
     self.setTranslate(diffX, diffY);
 
-    console.log('---- touch move ----', diffX, diffY);
+    // console.log('---- touch move ----', diffX, diffY);
 }
 
 Carousel.prototype.handleTouchEnd = function (event) {
@@ -628,10 +648,11 @@ Carousel.prototype.handleTouchEnd = function (event) {
 
     const diffOffset = self.isHor ? (self.touches.endX - self.touches.startX) : (self.touches.endY - self.touches.startY);
 
-    console.log('---- pos ----', self.touches.startX, self.touches.endX);
-    console.log('---- self.activeIndex ---', self.activeIndex);
+    // console.log('---- pos ----', self.touches.startX, self.touches.endX);
+    // console.log('---- self.activeIndex ---', self.activeIndex);
     // debugger
 
+    self.allowSlide = true;
     if (timeDiff < 500) {
         if (self.isHor) {
             if (self.touches.endX > self.touches.startX) {
@@ -665,7 +686,7 @@ Carousel.prototype.handleTouchEnd = function (event) {
         }
     }
 
-    console.log('---- touch end ----', event.touches, event.targetTouchs);
+    // console.log('---- touch end ----', event.touches, event.targetTouchs);
 }
 
 Carousel.prototype.initTouch = function () {
