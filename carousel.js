@@ -594,6 +594,7 @@ Carousel.prototype.handleTouchStart = function (event) {
     const self = this;
     const activeIndex = self.activeIndex;
     let offsetX = 0, offsetY = 0;
+    let newIndex = 0;
 
     self.touches.currentX = event.type === 'touchstart' ? event.touches[0].pageX : event.pageX;
     self.touches.currentY = event.type === 'touchstart' ? event.touches[0].pageY : event.pageY;
@@ -605,9 +606,11 @@ Carousel.prototype.handleTouchStart = function (event) {
     // if (activeIndex === 4) debugger
     if (activeIndex === 0) {
         // self.setTranslate();
-        offsetX = self.isHor ? -(self.slideTotal - 2) * self.slideWidth : 0;
-        offsetY = self.isHor ? 0 : -(self.slideTotal - 2) * self.slideHeight;
+        newIndex = self.slideTotal - 2;
+        offsetX = self.isHor ? -newIndex * self.slideWidth : 0;
+        offsetY = self.isHor ? 0 : -newIndex * self.slideHeight;
     } else if (activeIndex === self.slideTotal - 1) {
+        newIndex = 1;
         offsetX = self.isHor ? -self.slideWidth : 0;
         offsetY = self.isHor ? 0 : -self.slideHeight;
     }
@@ -619,6 +622,7 @@ Carousel.prototype.handleTouchStart = function (event) {
         self.removeTransition();
         self.setTranslate(offsetX, offsetY);
         self.updateTranslate(self.isHor ? offsetX : offsetY);
+        self.updateIndex(newIndex);
     }
     
     // console.log('---- touch start ----', event.touches, event.targetTouchs);
