@@ -370,7 +370,7 @@ Carousel.prototype.slideTo = function (index, speed) {
     const offsetX = self.isHor ? (self.activeIndex - correctIndex) * self.slideWidth : 0;
     const offsetY = self.isHor ? 0 : (self.activeIndex - correctIndex) * self.slideHeight;
     const transitionSpeed = speed ? speed : self.params.speed;
-    let time, loopIndex, transitionSpeed = ;
+    let time, loopIndex, transitionSpeed = speed ? speed : self.params.speed;
 
     if (!self.allowSlide) return;
     console.log('---- slideTo self.activeIndex ---', self.activeIndex);
