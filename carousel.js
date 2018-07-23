@@ -111,6 +111,7 @@ function Carousel(opts) {
         direction: 'horizontal',
         speed: 500,
         loop: false,
+        allowTouchMove: true,
         autoplay: {
             enabled: false,
             delay: 500,
@@ -265,7 +266,6 @@ Carousel.prototype.resetLoop = function () {
         return;
     }
     // console.log('--- resetLoop self.activeIndex ---', self.activeIndex);
-    // debugger
     self.currOffset = {
         x: 0,
         y: 0,
@@ -654,7 +654,6 @@ Carousel.prototype.handleTouchEnd = function (event) {
 
     // console.log('---- pos ----', self.touches.startX, self.touches.endX);
     // console.log('---- self.activeIndex ---', self.activeIndex);
-    // debugger
 
     self.allowSlide = true;
     if (timeDiff < 500) {
@@ -705,6 +704,21 @@ Carousel.prototype.handleMouseUp = function () {
     const self = this;
 }
 
+Carousel.prototype.initEvent = function () {
+    const self = this;
+
+    if (self.params.loop) {
+        addEvent(self.$wrapperEl, 'transitionend', self.handleTransitionEnd.bind(self));
+        addEvent(self.$wrapperEl, 'webkitTransitionEnd', self.handleTransitionEnd.bind(self));
+    }
+
+    if (self.params.allowTouchMove) {
+        addEvent(self.$wrapperEl, 'touchstart', self.handleTouchStart.bind(this));
+        addEvent(self.$wrapperEl, 'touchmove', self.handleTouchMove.bind(this));
+        addEvent(self.$wrapperEl, 'touchend', self.handleTouchEnd.bind(this));
+    }
+}
+
 /**
  * 初始化函数
  */
@@ -712,8 +726,6 @@ Carousel.prototype.init = function () {
     const self = this;
     const initialSlide = self.params.initialSlide;
     let initOffsetX = 0, initOffsetY = 0;
-
-    // debugger
 
     self.preRender();
     self.setTranslate(0, 0);
@@ -726,8 +738,6 @@ Carousel.prototype.init = function () {
 
     if (self.params.loop) {
         self.initLoop();
-        addEvent(self.$wrapperEl, 'transitionend', self.handleTransitionEnd.bind(self));
-        addEvent(self.$wrapperEl, 'webkitTransitionEnd', self.handleTransitionEnd.bind(self));
     }
 
     if (self.params.autoplay.enabled) {
@@ -742,9 +752,7 @@ Carousel.prototype.init = function () {
         self.renderNavigation();
     }
 
-    addEvent(self.$wrapperEl, 'touchstart', self.handleTouchStart.bind(this));
-    addEvent(self.$wrapperEl, 'touchmove', self.handleTouchMove.bind(this));
-    addEvent(self.$wrapperEl, 'touchend', self.handleTouchEnd.bind(this));
+    self.initEvent();
 }
 
 // 使用方法
