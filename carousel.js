@@ -364,8 +364,9 @@ Carousel.prototype.handleTransitionEnd = function () {
         self.resetLoop();
     }
 
+    console.log('---- self.autoplayStatus.running ----', self.autoplayStatus.running);
+
     if (self.params.autoplay.enabled && !self.autoplayStatus.running) {
-        self.autoplayStatus.running = true;
         self.startAutoplay();
     }
 }
@@ -465,8 +466,6 @@ Carousel.prototype.startAutoplay = function () {
     const speed = self.params.speed;
     const delay = self.params.autoplay.delay + speed;
 
-    self.autoplayStatus = false;
-
     self.autoplay(delay);
 }
 
@@ -476,6 +475,7 @@ Carousel.prototype.startAutoplay = function () {
 Carousel.prototype.stopAutoplay = function () {
     const self = this;
 
+    self.autoplayStatus.running = false;
     clearInterval(self.autoplayTime);
 }
 
@@ -623,10 +623,12 @@ Carousel.prototype.handleTouchStart = function (event) {
     self.touchStartTime = Date.now();
     // if (activeIndex === 4) debugger
 
+    console.log('--- touchStart ----', self.autoplayStatus.running);
     if (self.params.autoplay.enabled && self.autoplayStatus.running) {
         // self.autoplay.running = false;
         self.stopAutoplay();
     }
+    console.log('--- touchStart autoplay stop ----', self.autoplayStatus.running);
 
     if (activeIndex === 0) {
         // self.setTranslate();
