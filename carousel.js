@@ -604,6 +604,11 @@ Carousel.prototype.setDirClass = function () {
     addClass(self.$el, 'carousel-container-vertical');
 }
 
+/**
+ * touchstart/mousedown 事件执行函数
+ *
+ * @param {Object} event 事件对象
+ */
 Carousel.prototype.handleTouchStart = function (event) {
     const self = this;
     const activeIndex = self.activeIndex;
@@ -654,6 +659,12 @@ Carousel.prototype.handleTouchStart = function (event) {
     // console.log('---- touch start ----', event.touches, event.targetTouchs);
 }
 
+/**
+ * touchmove/mousemove 事件执行函数
+ *
+ * @param {Object} event 事件对象
+ * @returns
+ */
 Carousel.prototype.handleTouchMove = function (event) {
     const self = this;
     const touches = self.touches;
@@ -669,6 +680,12 @@ Carousel.prototype.handleTouchMove = function (event) {
 
 }
 
+/**
+ * touchend/mouseup 事件执行函数
+ *
+ * @param {Object} event 事件对象
+ * @returns
+ */
 Carousel.prototype.handleTouchEnd = function (event) {
     const self = this;
     const touchEndTime = Date.now();
@@ -722,6 +739,9 @@ Carousel.prototype.handleTouchEnd = function (event) {
     // console.log('---- touch end ----', event.touches, event.targetTouchs);
 }
 
+/**
+ * 初始化事件绑定
+ */
 Carousel.prototype.initEvent = function () {
     const self = this;
 
