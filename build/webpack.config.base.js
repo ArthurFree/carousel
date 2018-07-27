@@ -1,6 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+// import fs from 'fs';
+// import path from 'path';
+// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+const path = require('path');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
@@ -94,22 +95,27 @@ moduel.exports = {
     },
     mode: 'none',
     plugins: [],
+    bail: !isDebug,
+    cache: isDebug,
     stats: {
-        hash: false,
-        version: false,
-        timings: false,
+        hash: isVerbose,
+        version: isVerbose,
+        timings: true,
         children: false,
+        cached: isVerbose,
+        cachedAssets: isVerbose,
         errors: false,
         errorDetails: false,
         warnings: false,
-        chunks: false,
-        modules: false,
-        reasons: false,
+        chunks: isVerbose,
+        chunkModules: isVerbose,
+        modules: isVerbose,
+        reasons: isDebug,
         source: false,
         publicPath: false,
     },
     performance: {
         hints: false,
     },
-    devtool: false,
+    devtool: isDebug ? 'cheap-module-inline-source-map' : 'source-map',
 }
