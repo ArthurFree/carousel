@@ -2,11 +2,13 @@
 // import path from 'path';
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 const path = require('path');
+const webpack = require('webpack');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
 const SRC_DIR = resolvePath('src');
 const BUILD_DIR = resolvePath('build');
+const DIST_DIR = resolvePath('dist');
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
@@ -16,106 +18,101 @@ const reScript = /\.(js|jsx)$/;
 const reStyle = /\.(css|less|scss|sass|styl)$/;
 const reImage = /\.(bmp|gif|jpg|jpeg|png|svg)$/;
 
-function cssLoader(importLoaders) {
-    return {
-        importLoaders,
-        import: false,
-        minimize: false,
-        sourceMap: true,
-    }
-}
+porcess.npDeprecation = true;
 
-function postcssLoader() {
-    return {
-        ident: 'postcss-loader',
-        plugins: [
-            require('autoprefixer')(),
-        ],
-        sourceMap: true,
-    }
-}
-
-moduel.exports = {
-    entry: '../carousel.js',
-    output: {
-        path: path.resolve(__dirname, '..', 'dist'),
-        filename: 'carousel.js',
+module.exports = options => ({
+    mode: options.mode,
+    entry: options.entry,
+    output: Object(
+        {
+            path: DIST_DIR,
+            publicPath: '/',
+        },
+        options.output,
+    ),
+    optimization: options.optimization,
+    resolve: {
+        modules: ['node_modules', 'app'],
+        extensions: ['.js', '.jsx'],
+        mainFields: ['browser', 'jsnext:main', 'main'],
     },
+    devtool: options.devtool,
+    target; 'web',
+    performance: options.performance || {},
     module: {
         rules: [
-            // js
             {
                 test: reScript,
-                exclude: /(node_modules|bower_components)/,
-                loader: 'babel-loader',
-                options: { cacheDirectory: true, },
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: options.babelQuery,
+                }
             },
-            // css
             {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    {
-                        loader: 'css-loader',
-                        options: cssLoader(1),
-                    },
-                    {
-                        loader: 'postcss-loader',
-                        options: postcssLoader(),
-                    }
-                ]
+                test: reStyle,
+                exclude: /node_modules/,
+                use: ['style-loader', 'css-loader'],
             },
-            // less
             {
-                test: /\.less$/,
+                test: /\.(eot|otf|ttf|woff|woff2)$/,
+                use: 'file-loader',
+            },
+            {
+                test: /\.svg$/,
                 use: [
-                    'style-loader',
                     {
-                        loader: 'css-loader',
-                        options: cssLoader(2),
-                    },
-                    {
-                        loader: 'postcss-loader',
-                        options: postcssLoader(),
-                    },
-                    {
-                        loader: 'less-loader',
+                        loader: 'svg-url-loader',
                         options: {
-                            sourceMap: true,
-                            javascriptEnabled: true,
-                        },
+                            limit: 10 * 1024,
+                            noquotes: true,
+                        }
                     }
                 ],
             },
+            {
+                test: reImage,
+                options: {
+                    mozjpeg: {
+                        enabled: false,
+                    },
+                    gifsicle: {
+                        interlaced: false,
+                    },
+                    optipng: {
+                        optimizationLevel: 7,
+                    },
+                    pngquant: {
+                        quality: '65-90',
+                        speed: 4,
+                    },
+                },
+            },
+            {
+                test: /\.html$/,
+                use: {
+                    loader: 'html-loader',
+                },
+            },
+            {
+                test: /\.(mp4|webm)$/,
+                use: {
+                    loader: 'url-loader',
+                    options; {
+                        limit: 10000,
+                    },
+                },
+            },
         ],
     },
-    resolve: {
-        alias: [],
-        modules: ['node_modules', 'src'],
-    },
-    mode: 'none',
-    plugins: [],
-    bail: !isDebug,
-    cache: isDebug,
-    stats: {
-        hash: isVerbose,
-        version: isVerbose,
-        timings: true,
-        children: false,
-        cached: isVerbose,
-        cachedAssets: isVerbose,
-        errors: false,
-        errorDetails: false,
-        warnings: false,
-        chunks: isVerbose,
-        chunkModules: isVerbose,
-        modules: isVerbose,
-        reasons: isDebug,
-        source: false,
-        publicPath: false,
-    },
-    performance: {
-        hints: false,
-    },
-    devtool: isDebug ? 'cheap-module-inline-source-map' : 'source-map',
-}
+    plugins: options.plugins.concat([
+        // new webpack.ProvidePlugin({
+            // fetch: 'exports-loader?self.fetch!whatwg-fetch',
+        // }),
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+            },
+        }),
+    ]),
+});
