@@ -72,21 +72,32 @@ module.exports = options => ({
             },
             {
                 test: reImage,
-                options: {
-                    mozjpeg: {
-                        enabled: false,
+                loader: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            limit: 10 * 1024,
+                        }
                     },
-                    gifsicle: {
-                        interlaced: false,
-                    },
-                    optipng: {
-                        optimizationLevel: 7,
-                    },
-                    pngquant: {
-                        quality: '65-90',
-                        speed: 4,
-                    },
-                },
+                    {
+                        loader: 'image-webpack-loader',
+                        options: {
+                            mozjpeg: {
+                                enabled: false,
+                            },
+                            gifsicle: {
+                                interlaced: false,
+                            },
+                            optipng: {
+                                optimizationLevel: 7,
+                            },
+                            pngquant: {
+                                quality: '65-90',
+                                speed: 4,
+                            },
+                        },
+                    }
+                ],
             },
             {
                 test: /\.html$/,
