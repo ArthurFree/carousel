@@ -18,7 +18,7 @@ const reScript = /\.(js|jsx)$/;
 const reStyle = /\.(css|less|scss|sass|styl)$/;
 const reImage = /\.(bmp|gif|jpg|jpeg|png|svg)$/;
 
-porcess.npDeprecation = true;
+process.npDeprecation = true;
 
 module.exports = options => ({
     mode: options.mode,
@@ -37,7 +37,7 @@ module.exports = options => ({
         mainFields: ['browser', 'jsnext:main', 'main'],
     },
     devtool: options.devtool,
-    target; 'web',
+    target: 'web',
     performance: options.performance || {},
     module: {
         rules: [
@@ -109,7 +109,7 @@ module.exports = options => ({
                 test: /\.(mp4|webm)$/,
                 use: {
                     loader: 'url-loader',
-                    options; {
+                    options: {
                         limit: 10000,
                     },
                 },

@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 // const logger = require('../../server/logger');
-const pkg = require(path.resolve(process.cwd(), '..', 'package.json'));
+// const pkg = require(path.resolve(process.cwd(), '..', 'package.json'));
 // const { dllPlugin } = pkg;
 
 const plugins = [
@@ -35,11 +35,11 @@ if (dllPlugin) {
 */
 
 module.exports = require('./webpack.config.base.js')({
-    mode: 'develop',
+    mode: 'development',
     entry: [
         'eventsource-polyfill',
         'webpack-hot-middleware/client?reload=true',
-        path.join(process.cwd(), '..', 'index.js')
+        path.join(__dirname, '..', 'carousel.js')
     ],
     output: {
         filename: '[name].js',
