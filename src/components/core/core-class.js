@@ -59,7 +59,41 @@ import defaultOpts from './default';
         self.init();
     }
 
-    init() {}
+    /**
+     * 初始化函数
+     */
+    init() {
+        const self = this;
+        const initialSlide = self.params.initialSlide;
+        let initOffsetX = 0, initOffsetY = 0;
+
+        self.preRender();
+        self.setTranslate(0, 0);
+        // self.setTransition('transform', 0);
+        self.removeTransition();
+
+        if (self.isVer) {
+            self.setDirClass();
+        }
+
+        if (self.params.loop) {
+            self.initLoop();
+        }
+
+        if (self.params.autoplay.enabled) {
+            self.autoplay(self.params.autoplay.delay);
+        }
+
+        if (self.params.pagination.enabled) {
+            self.renderPagination();
+        }
+
+        if (self.params.navigation.enabled) {
+            self.renderNavigation();
+        }
+
+        self.initEvent();
+    }
 }
 
 export default Carousel;
